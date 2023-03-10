@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Rv.BitTorrentActors.Bencoding;
 
+// https://wiki.theory.org/BitTorrentSpecification#Bencoding
 public class BenValueParser
 {
     public BenValue Parse(string value)
