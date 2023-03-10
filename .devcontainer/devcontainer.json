@@ -1,0 +1,20 @@
+{
+	"name": "Bittorrent actors",
+	
+	"dockerComposeFile": "docker-compose.yaml",
+	"service": "devcontainer-csharp",
+    "workspaceFolder": "/workspaces",
+
+	"forwardPorts": [],
+	"otherPortsAttributes": {
+		"onAutoForward" : "ignore"
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"formulahendry.dotnet-test-explorer"
+			]
+		}
+	}
+}

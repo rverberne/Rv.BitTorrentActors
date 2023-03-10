@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "process",
+            "label": "build",
+            "problemMatcher": "$msCompile",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/Rv.BitTorrentActors/Rv.BitTorrentActors.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ]
+        },
+        {
+            "label": "publish",
+            "type": "process",
+            "problemMatcher": "$msCompile",
+            "command": "dotnet",
+            "args": [
+                "publish",
+                "${workspaceFolder}/Rv.BitTorrentActors/Rv.BitTorrentActors.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ]
+        },
+        {
+            "label": "watch",
+            "type": "process",
+            "problemMatcher": "$msCompile",
+            "command": "dotnet",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/Rv.BitTorrentActors/Rv.BitTorrentActors.csproj"
+            ]
+        }
+    ]
+}

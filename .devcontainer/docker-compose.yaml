@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+
+  devcontainer-csharp:
+    image: mcr.microsoft.com/devcontainers/dotnet:0-7.0
+    volumes:
+      - ..:/workspaces:cached
+    command: sleep infinity
