@@ -19,22 +19,32 @@ public class BenValueParser
 
     public BenValue Parse(Stream stream)
     {
-        int firstByte = stream.ReadByte();
+        BenValue result = ParseInternal(stream) switch
+        {
+            ParsedValue r => r.Value,
+            _ => throw new InvalidOperationException("Invalid bencode stream,")
+        };
+        return result;
+    }
 
+    private ParseResult ParseInternal(Stream stream)
+    {
+        int firstByte = stream.ReadByte();
+        
         if (firstByte == 'i')
-            return ReadInteger(stream);
+            return new ParsedValue(ReadInteger(stream));
 
         if (firstByte >= '0' && firstByte <= '9')
-            return ReadByteString(firstByte, stream);
+            return new ParsedValue(ReadByteString(firstByte, stream));
 
         if (firstByte == 'l')
-            return ReadList(stream);
+            return new ParsedValue(ReadList(stream));
 
         if (firstByte == 'd')
-            return ReadDictionary(stream);
+            return new ParsedValue(ReadDictionary(stream));
         
         if (firstByte == 'e')
-            return BenEndToken.Instance;
+            return new ParsedEndToken();
 
         throw new InvalidOperationException("Could not detect value kind.");
     }
@@ -79,12 +89,13 @@ public class BenValueParser
 
         while (true)
         {
-            BenValue listItem = Parse(stream);
+            ParseResult parsedElement = ParseInternal(stream);
 
-            if (listItem is BenEndToken)
+            if (parsedElement is ParsedEndToken)
                 break;
             
-            list.Add(listItem);
+            if (parsedElement is ParsedValue { Value: BenValue value })
+                list.Add(value);
         }
 
         return new BenList(list);
@@ -96,13 +107,18 @@ public class BenValueParser
 
         while (true)
         {
-            BenValue key = Parse(stream);
+            ParseResult parsedKey = ParseInternal(stream);
 
-            if (key is BenEndToken)
+            if (parsedKey is ParsedEndToken)
                 break;
+
+            if (!(parsedKey is ParsedValue { Value: BenByteString key }))
+                throw new InvalidOperationException("Dictionary key should be a string.");
             
-            BenValue value = Parse(stream);
-            dict.Add((BenByteString)key, value);
+            if (!(ParseInternal(stream) is ParsedValue { Value: BenValue value }))
+                throw new InvalidOperationException("Unexpected dictionary value.");
+            
+            dict.Add(key, value);
         }
 
         return new BenDictionary(dict);
