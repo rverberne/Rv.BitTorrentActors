@@ -21,8 +21,8 @@ public class BenValueParser
     {
         BenValue result = ParseInternal(stream) switch
         {
-            ParsedValue r => r.Value,
-            _ => throw new InvalidOperationException("Invalid bencode stream,")
+            ParsedValue { Value: BenValue v } => v,
+            _ => throw new InvalidOperationException("Invalid bencode stream.")
         };
         return result;
     }
@@ -30,23 +30,16 @@ public class BenValueParser
     private ParseResult ParseInternal(Stream stream)
     {
         int firstByte = stream.ReadByte();
-        
-        if (firstByte == 'i')
-            return new ParsedValue(ReadInteger(stream));
-
-        if (firstByte >= '0' && firstByte <= '9')
-            return new ParsedValue(ReadByteString(firstByte, stream));
-
-        if (firstByte == 'l')
-            return new ParsedValue(ReadList(stream));
-
-        if (firstByte == 'd')
-            return new ParsedValue(ReadDictionary(stream));
-        
-        if (firstByte == 'e')
-            return new ParsedEndToken();
-
-        throw new InvalidOperationException("Could not detect value kind.");
+        ParseResult result = firstByte switch
+        {
+            'i' => new ParsedValue(ReadInteger(stream)),
+            'l' => new ParsedValue(ReadList(stream)),
+            'd' => new ParsedValue(ReadDictionary(stream)),
+            'e' => new ParsedEndToken(),
+            >= '0' and <= '9' => new ParsedValue(ReadByteString(firstByte, stream)),
+            _ => throw new InvalidOperationException("Could not detect value kind.")
+        };
+        return result;
     }
 
     private BenInteger ReadInteger(Stream stream)
